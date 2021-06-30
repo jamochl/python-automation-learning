@@ -66,52 +66,50 @@ board_missing_king = {
 def validate_chess(board) -> bool:
     valid_pieces = ('pawn', 'knight', 'bishop', 'rook', 'queen', 'king')
 
-    white_num = 0
-    white_pawns = 0
-    white_kings = 0
-
-    black_num = 0
-    black_pawns = 0
-    black_kings = 0
+    player_statistics = {
+        'w': {
+            'num': 0,
+            'pawns': 0,
+            'kings': 0
+        },
+        'b': {
+            'num': 0,
+            'pawns': 0,
+            'kings': 0
+        }
+    }
 
     for key, value in board.items():
         # Validate the key
         num_coor = int(key[0])
         str_coor = key[1]
-        if num_coor < 1 or num_coor > 8:
-            return False
-        if str_coor < 'a' or str_coor > 'h':
+        if num_coor < 1 or num_coor > 8 or str_coor < 'a' or str_coor > 'h':
             return False
 
         # Validate the value
         player = value[0]
-        if player == 'w':
-            white_num += 1
-        elif player == 'b':
-            black_num += 1
-        else:
+        if player != 'w' and player != 'b':
             return False
 
         # Validate the piece
         piece = value[1:]
         if piece not in valid_pieces:
             return False
-        elif piece == 'pawn':
-            if player == 'w':
-                white_pawns += 1
-            else:
-                black_pawns += 1
+
+        # Determine 'num', 'pawns' and 'kings'
+        player_statistics[player]['num'] += 1
+
+        if piece == 'pawn':
+            player_statistics[player]['pawns'] += 1
         elif piece == 'king':
-            if player == 'w':
-                white_kings += 1
-            else:
-                black_kings += 1
+            player_statistics[player]['kings'] += 1
 
     # Validate the number of pieces
-    if white_num > 16 or black_num > 16 or \
-       white_pawns > 8 or black_pawns > 8 or \
-       white_kings != 1 or black_kings != 1:
-        return False
+    for player_dict in player_statistics.values():
+        if player_dict['num'] > 16 or \
+           player_dict['pawns'] > 8 or \
+           player_dict['kings'] != 1:
+            return False
 
     # Default return true if tests pass
     return True
